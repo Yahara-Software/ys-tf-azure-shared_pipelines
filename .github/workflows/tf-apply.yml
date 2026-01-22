@@ -1,0 +1,66 @@
+# central-repo/.github/workflows/tf-apply.yml
+name: "Terraform Apply"
+on:
+  workflow_call:
+    inputs:
+      env: { required: true, type: string }
+      path: { required: true, type: string }
+
+jobs:
+  check-and-plan:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+
+      # 1. Functional Requirement: Fmt/Validate
+      - name: Static Checks
+        run: |
+          terraform fmt -check
+          terraform init -backend=false
+          terraform validate
+
+      # 2. Security Check (Policy Violation)
+      - name: Run tfsec (Security Scan)
+        uses: aquasecurity/tfsec-action@v1.0.0
+
+      - name: Terraform Init & Plan
+        run: |
+          STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
+          terraform init -backend-config="key=$STATE_KEY" -working-directory=${{ inputs.path }}
+          # 3. Functional Requirement: Save Plan Artifact
+          terraform plan -out=tfplan -working-directory=${{ inputs.path }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}-${{ inputs.env }}-plan
+          path: ${{ inputs.path }}/tfplan
+
+  apply:
+    needs: check-and-plan
+    if: github.ref == 'refs/heads/main'
+    environment: ${{ inputs.env }} # <--- APPROVAL GATE
+    runs-on: ubuntu-latest
+    concurrency: terraform-${{ github.event.repository.name }}-${{ inputs.env }} # PREVENT CONCURRENT RUNS
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}-${{ inputs.env }}-plan
+          path: ${{ inputs.path }}
+
+      - name: Terraform Apply
+        run: |
+          STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
+          terraform init -backend-config="key=$STATE_KEY" -working-directory=${{ inputs.path }}
+          terraform apply -auto-approve tfplan
+        working-directory: ${{ inputs.path }}
+
+      # 4. Functional Requirement: Automated Testing
+      - name: Run Terratest
+        run: |
+          cd test && go test -v -timeout 15m
