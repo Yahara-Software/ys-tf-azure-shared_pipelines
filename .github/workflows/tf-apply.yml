@@ -19,6 +19,7 @@ jobs:
       # 1. Functional Requirement: Fmt/Validate
       - name: Static Checks
         run: |
+          cd ${{ inputs.path }}
           terraform fmt -check
           terraform init -backend=false
           terraform validate
@@ -30,9 +31,9 @@ jobs:
       - name: Terraform Init & Plan
         run: |
           STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
-          terraform init -backend-config="key=$STATE_KEY" -working-directory=${{ inputs.path }}
+          terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
           # 3. Functional Requirement: Save Plan Artifact
-          terraform plan -out=tfplan -working-directory=${{ inputs.path }}
+          terraform -chdir=${{ inputs.path }} plan -out=tfplan
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -56,9 +57,8 @@ jobs:
       - name: Terraform Apply
         run: |
           STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
-          terraform init -backend-config="key=$STATE_KEY" -working-directory=${{ inputs.path }}
-          terraform apply -auto-approve tfplan
-        working-directory: ${{ inputs.path }}
+          terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
+          terraform -chdir=${{ inputs.path }} apply -auto-approve tfplan
 
       # 4. Functional Requirement: Automated Testing
       - name: Run Terratest
