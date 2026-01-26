@@ -24,13 +24,15 @@ jobs:
       
       - name: Configure Git for HTTPS
         run: |
-          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/Yahara-Software/".insteadOf "git::ssh://git@github.com/Yahara-Software/"
-          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/Yahara-Software/".insteadOf "ssh://git@github.com/Yahara-Software/"
+          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "https://github.com/Yahara-Software/"
       
       - uses: hashicorp/setup-terraform@v3
 
       # 1. Functional Requirement: Fmt/Validate
       - name: Static Checks
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           cd ${{ inputs.path }}
           terraform fmt -check
@@ -42,6 +44,8 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.0
 
       - name: Terraform Init & Plan
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
           terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
@@ -72,8 +76,8 @@ jobs:
       
       - name: Configure Git for HTTPS
         run: |
-          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/Yahara-Software/".insteadOf "git::ssh://git@github.com/Yahara-Software/"
-          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/Yahara-Software/".insteadOf "ssh://git@github.com/Yahara-Software/"
+          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "https://github.com/Yahara-Software/"
       
       - uses: hashicorp/setup-terraform@v3
       
@@ -83,6 +87,8 @@ jobs:
           path: ${{ inputs.path }}
 
       - name: Terraform Apply
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
           terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
