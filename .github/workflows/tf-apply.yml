@@ -5,6 +5,10 @@ on:
     inputs:
       env: { required: true, type: string }
       path: { required: true, type: string }
+    secrets:
+      SSH_PRIVATE_KEY:
+        required: true
+        description: "SSH private key for accessing Terraform modules from private repositories"
 
 jobs:
   check-and-plan:
