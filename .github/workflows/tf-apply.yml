@@ -23,18 +23,19 @@ jobs:
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
       
       - name: Configure Git Authentication
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          git config --global credential.helper store
-          echo "https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com" > ~/.git-credentials
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "https://github.com"
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "git@github.com:"
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "ssh://git@github.com"
       
       - uses: hashicorp/setup-terraform@v3
 
       # 1. Functional Requirement: Fmt/Validate
       - name: Static Checks
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GIT_TERMINAL_PROMPT: 0
         run: |
           cd ${{ inputs.path }}
           terraform fmt -check
@@ -77,11 +78,12 @@ jobs:
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
       
       - name: Configure Git Authentication
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          git config --global credential.helper store
-          echo "https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com" > ~/.git-credentials
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "https://github.com"
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "git@github.com:"
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "ssh://git@github.com"
       
       - uses: hashicorp/setup-terraform@v3
       
@@ -92,7 +94,7 @@ jobs:
 
       - name: Terraform Apply
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GIT_TERMINAL_PROMPT: 0
         run: |
           STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
           terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
