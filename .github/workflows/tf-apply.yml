@@ -26,9 +26,14 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "https://github.com"
-          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "git@github.com:"
-          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "ssh://git@github.com"
+          cat > ~/.netrc <<EOF
+          machine github.com
+          login x-access-token
+          password ${GH_TOKEN}
+          EOF
+          chmod 600 ~/.netrc
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
       
       - uses: hashicorp/setup-terraform@v3
 
@@ -81,9 +86,14 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "https://github.com"
-          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "git@github.com:"
-          git config --global url."https://x-access-token:${GH_TOKEN}@github.com".insteadOf "ssh://git@github.com"
+          cat > ~/.netrc <<EOF
+          machine github.com
+          login x-access-token
+          password ${GH_TOKEN}
+          EOF
+          chmod 600 ~/.netrc
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
       
       - uses: hashicorp/setup-terraform@v3
       
