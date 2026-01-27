@@ -61,7 +61,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repositError: The ssh-private-key argument is empty. Maybe the secret has not been configured, or you are using a wrong secret name in your workflow file.ory.name }}-${{ inputs.env }}-plan
+          name: ${{ github.event.repository.name }}-${{ inputs.env }}-plan
           path: ${{ inputs.path }}/tfplan
 
   apply:
