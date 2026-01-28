@@ -29,6 +29,21 @@ jobs:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
+          repositories: >
+            ys-tf-azure-service_plan,
+            ys-tf-azure-linux_web_app,
+            ys-tf-azure-resource_group,
+            ys-tf-azure-acr,
+            ys-tf-azure-virtual_network,
+            ys-tf-azure-security_group,
+            ys-tf-azure-public_ip,
+            ys-tf-azure-virtual_machine,
+            ys-tf-azure-app_gateway,
+            ys-tf-azure-mssql_server,
+            ys-tf-azure-mssql_database,
+            ys-tf-azure-storage_account,
+            ys-tf-azure-key_vault,
+            ys-tf-azure-frontdoor
       
       - name: Configure Git to use token
         run: |
@@ -81,6 +96,21 @@ jobs:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
+          repositories: >
+            ys-tf-azure-service_plan,
+            ys-tf-azure-linux_web_app,
+            ys-tf-azure-resource_group,
+            ys-tf-azure-acr,
+            ys-tf-azure-virtual_network,
+            ys-tf-azure-security_group,
+            ys-tf-azure-public_ip,
+            ys-tf-azure-virtual_machine,
+            ys-tf-azure-app_gateway,
+            ys-tf-azure-mssql_server,
+            ys-tf-azure-mssql_database,
+            ys-tf-azure-storage_account,
+            ys-tf-azure-key_vault,
+            ys-tf-azure-frontdoor
       
       - name: Configure Git to use token
         run: |
