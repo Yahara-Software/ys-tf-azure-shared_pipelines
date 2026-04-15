@@ -12,6 +12,15 @@ on:
       GH_APP_PRIVATE_KEY:
         required: true
         description: "GitHub App private key for accessing Terraform modules from private repositories"
+      AZURE_CLIENT_ID:
+        required: true
+        description: "Azure Client ID for OIDC authentication"
+      AZURE_TENANT_ID:
+        required: true
+        description: "Azure Tenant ID"
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+        description: "Azure Subscription ID"
 
 jobs:
   check-and-plan:
@@ -21,6 +30,13 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
       - name: Generate GitHub App Token
         id: generate-token
@@ -94,6 +110,13 @@ jobs:
     concurrency: terraform-${{ github.event.repository.name }}-${{ inputs.env }} # PREVENT CONCURRENT RUNS
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
       - name: Generate GitHub App Token
         id: generate-token
