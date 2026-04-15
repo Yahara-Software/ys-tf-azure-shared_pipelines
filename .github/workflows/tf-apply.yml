@@ -92,8 +92,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
-          terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
+          terraform -chdir=${{ inputs.path }} init 
           # 3. Functional Requirement: Save Plan Artifact
           terraform -chdir=${{ inputs.path }} plan -out=tfplan
 
