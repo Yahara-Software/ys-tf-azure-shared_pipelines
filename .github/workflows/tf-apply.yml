@@ -43,7 +43,10 @@ jobs:
             ys-tf-azure-mssql_database,
             ys-tf-azure-storage_account,
             ys-tf-azure-key_vault,
-            ys-tf-azure-frontdoor
+            ys-tf-azure-frontdoor,
+            ys-tf-azure-app_insights,
+            ys-tf-azure-alert_rules,
+            ys-tf-azure-action_groups
       
       - name: Configure Git to use token
         run: |
@@ -110,7 +113,10 @@ jobs:
             ys-tf-azure-mssql_database,
             ys-tf-azure-storage_account,
             ys-tf-azure-key_vault,
-            ys-tf-azure-frontdoor
+            ys-tf-azure-frontdoor,
+            ys-tf-azure-app_insights,
+            ys-tf-azure-alert_rules,
+            ys-tf-azure-action_groups
       
       - name: Configure Git to use token
         run: |
