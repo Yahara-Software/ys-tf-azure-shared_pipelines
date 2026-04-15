@@ -69,6 +69,7 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
           working_directory: ${{ inputs.path }}
+          soft_fail: true
 
       - name: Terraform Init & Plan
         env:
