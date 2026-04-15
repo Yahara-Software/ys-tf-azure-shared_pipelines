@@ -25,6 +25,7 @@ on:
 jobs:
   check-and-plan:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
     permissions:
       id-token: write
       contents: read
