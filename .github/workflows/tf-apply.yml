@@ -104,8 +104,7 @@ jobs:
 
   apply:
     needs: check-and-plan
-    if: github.ref == 'refs/heads/main'
-    environment: ${{ inputs.env }} # <--- APPROVAL GATE
+    environment: ${{ inputs.env }} # <--- APPROVAL GATE (controls when apply runs)
     runs-on: ubuntu-latest
     concurrency: terraform-${{ github.event.repository.name }}-${{ inputs.env }} # PREVENT CONCURRENT RUNS
     steps:
