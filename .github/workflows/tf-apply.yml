@@ -158,8 +158,7 @@ jobs:
         env:
           GIT_TERMINAL_PROMPT: 0
         run: |
-          STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
-          terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
+          terraform -chdir=${{ inputs.path }} init 
           terraform -chdir=${{ inputs.path }} apply -auto-approve tfplan
 
       # 4. Functional Requirement: Automated Testing
