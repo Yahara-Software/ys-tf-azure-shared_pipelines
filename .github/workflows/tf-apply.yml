@@ -158,8 +158,10 @@ jobs:
       - name: Terraform Apply
         env:
           GIT_TERMINAL_PROMPT: 0
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          terraform -chdir=${{ inputs.path }} init 
+          STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
+          terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
           terraform -chdir=${{ inputs.path }} apply -auto-approve tfplan
 
       # 4. Functional Requirement: Automated Testing
