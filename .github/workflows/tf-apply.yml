@@ -5,7 +5,7 @@ on:
     inputs:
       env: { required: true, type: string }
       path: { required: true, type: string }
-      runner: { required: false, type: string, default: "ubuntu-latest" }
+      #runner: { required: false, type: string, default: "ubuntu-latest" }
     secrets:
       GH_APP_ID:
         required: true
