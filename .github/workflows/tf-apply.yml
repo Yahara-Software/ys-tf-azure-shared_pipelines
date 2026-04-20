@@ -25,7 +25,7 @@ on:
 
 jobs:
   check-and-plan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     environment: ${{ inputs.env }}
     permissions:
       id-token: write
