@@ -90,13 +90,17 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GIT_TERMINAL_PROMPT: 0
         run: |
+          # Clear any existing git URL rewrites (important for self-hosted runners)
+          git config --global --remove-section url."ssh://git@github.com/" || true
+          git config --global --unset-all url."https://x-access-token.*@github.com/".insteadOf || true
+          
           # Configure Git to use HTTPS with token
           TOKEN="${{ steps.generate-token.outputs.token }}"
           git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
           
           # Verify configuration
           echo "=== Git config ==="
-          git config --get-regexp '^url\.' || echo "No URL configs found"
+          git config --list --show-origin | grep -i url || echo "No URL configs found"
           
           terraform -chdir=${{ inputs.path }} init 
           # 3. Functional Requirement: Save Plan Artifact
@@ -161,19 +165,23 @@ jobs:
           GIT_TERMINAL_PROMPT: 0
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
+          # Clear any existing git URL rewrites (important for self-hosted runners)
+          git config --global --remove-section url."ssh://git@github.com/" || true
+          git config --global --unset-all url."https://x-access-token.*@github.com/".insteadOf || true
+          
           # Configure Git to use HTTPS with token
           TOKEN="${{ steps.generate-token.outputs.token }}"
           git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
           
           # Verify configuration
           echo "=== Git config ==="
-          git config --get-regexp '^url\.' || echo "No URL configs found"
+          git config --list --show-origin | grep -i url || echo "No URL configs found"
           
           # Remove cached modules to force re-download with correct git config
           rm -rf ${{ inputs.path }}/.terraform/modules
           
-         
-          terraform -chdir=${{ inputs.path }} init 
+          STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
+          terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
           terraform -chdir=${{ inputs.path }} apply -auto-approve tfplan
 
       # 4. Functional Requirement: Automated Testing
