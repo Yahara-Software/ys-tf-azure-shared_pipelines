@@ -66,6 +66,10 @@ jobs:
             ys-tf-azure-alert_rules,
             ys-tf-azure-action_groups
       
+      - name: Configure Git to use token
+        run: |
+          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
+      
       - uses: hashicorp/setup-terraform@v3
 
       # 1. Functional Requirement: Fmt/Validate
@@ -88,20 +92,7 @@ jobs:
       - name: Terraform Init & Plan
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          GIT_TERMINAL_PROMPT: 0
         run: |
-          # Clear any existing git URL rewrites (important for self-hosted runners)
-          git config --global --remove-section url."ssh://git@github.com/" || true
-          git config --global --unset-all url."https://x-access-token.*@github.com/".insteadOf || true
-          
-          # Configure Git to use HTTPS with token
-          TOKEN="${{ steps.generate-token.outputs.token }}"
-          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
-          
-          # Verify configuration
-          echo "=== Git config ==="
-          git config --list --show-origin | grep -i url || echo "No URL configs found"
-          
           terraform -chdir=${{ inputs.path }} init 
           # 3. Functional Requirement: Save Plan Artifact
           terraform -chdir=${{ inputs.path }} plan -out=tfplan
@@ -153,6 +144,10 @@ jobs:
             ys-tf-azure-alert_rules,
             ys-tf-azure-action_groups
       
+      - name: Configure Git to use token
+        run: |
+          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
+      
       - uses: hashicorp/setup-terraform@v3
       
       - uses: actions/download-artifact@v4
@@ -163,23 +158,7 @@ jobs:
       - name: Terraform Apply
         env:
           GIT_TERMINAL_PROMPT: 0
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          # Clear any existing git URL rewrites (important for self-hosted runners)
-          git config --global --remove-section url."ssh://git@github.com/" || true
-          git config --global --unset-all url."https://x-access-token.*@github.com/".insteadOf || true
-          
-          # Configure Git to use HTTPS with token
-          TOKEN="${{ steps.generate-token.outputs.token }}"
-          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
-          
-          # Verify configuration
-          echo "=== Git config ==="
-          git config --list --show-origin | grep -i url || echo "No URL configs found"
-          
-          # Remove cached modules to force re-download with correct git config
-          rm -rf ${{ inputs.path }}/.terraform/modules
-          
           terraform -chdir=${{ inputs.path }} init
           terraform -chdir=${{ inputs.path }} apply -auto-approve tfplan
 
