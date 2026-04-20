@@ -90,9 +90,13 @@ jobs:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           GIT_TERMINAL_PROMPT: 0
         run: |
-          # Create .gitconfig with URL rewriting
-          echo "[url \"https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/\"]" > ~/.gitconfig
-          echo "  insteadOf = ssh://git@github.com/" >> ~/.gitconfig
+          # Configure Git to use HTTPS with token
+          TOKEN="${{ steps.generate-token.outputs.token }}"
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
+          
+          # Verify configuration
+          echo "=== Git config ==="
+          git config --get-regexp '^url\.' || echo "No URL configs found"
           
           terraform -chdir=${{ inputs.path }} init 
           # 3. Functional Requirement: Save Plan Artifact
@@ -157,15 +161,13 @@ jobs:
           GIT_TERMINAL_PROMPT: 0
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          # Create .gitconfig with URL rewriting
-          echo "[url \"https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/\"]" > ~/.gitconfig
-          echo "  insteadOf = ssh://git@github.com/" >> ~/.gitconfig
+          # Configure Git to use HTTPS with token
+          TOKEN="${{ steps.generate-token.outputs.token }}"
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
           
-          # Verify git config
-          echo "=== .gitconfig contents ==="
-          cat ~/.gitconfig
-          echo "=== git config check ==="
-          git config --get-regexp url || true
+          # Verify configuration
+          echo "=== Git config ==="
+          git config --get-regexp '^url\.' || echo "No URL configs found"
           
           # Remove cached modules to force re-download with correct git config
           rm -rf ${{ inputs.path }}/.terraform/modules
