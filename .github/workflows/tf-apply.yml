@@ -160,6 +160,9 @@ jobs:
           GIT_TERMINAL_PROMPT: 0
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
+          # Configure Git to use HTTPS with token for module downloads
+          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
+          
           STATE_KEY="${{ github.event.repository.name }}.${{ inputs.env }}.tfstate"
           terraform -chdir=${{ inputs.path }} init -backend-config="key=$STATE_KEY"
           terraform -chdir=${{ inputs.path }} apply -auto-approve tfplan
