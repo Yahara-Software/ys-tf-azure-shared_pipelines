@@ -5,6 +5,7 @@ on:
     inputs:
       env: { required: true, type: string }
       path: { required: true, type: string }
+      runner: { required: false, type: string, default: "ubuntu-latest" }
     secrets:
       GH_APP_ID:
         required: true
@@ -24,7 +25,7 @@ on:
 
 jobs:
   check-and-plan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     environment: ${{ inputs.env }}
     permissions:
       id-token: write
@@ -105,7 +106,7 @@ jobs:
   apply:
     needs: check-and-plan
     environment: ${{ inputs.env }} # <--- APPROVAL GATE (controls when apply runs)
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     concurrency: terraform-${{ github.event.repository.name }}-${{ inputs.env }} # PREVENT CONCURRENT RUNS
     steps:
       - uses: actions/checkout@v4
