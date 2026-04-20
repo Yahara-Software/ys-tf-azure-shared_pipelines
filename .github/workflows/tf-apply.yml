@@ -159,9 +159,13 @@ jobs:
         env:
           GIT_TERMINAL_PROMPT: 0
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          # Configure Git URL rewriting via environment variables
+          GIT_CONFIG_COUNT: 1
+          GIT_CONFIG_KEY_0: "url.https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/.insteadOf"
+          GIT_CONFIG_VALUE_0: "ssh://git@github.com/"
         run: |
-          # Configure Git to use HTTPS with token for module downloads
-          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
+          # Verify git config is set
+          git config --get-regexp url
           
           # Remove cached modules to force re-download with correct git config
           rm -rf ${{ inputs.path }}/.terraform/modules
