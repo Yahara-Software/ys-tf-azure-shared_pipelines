@@ -66,10 +66,6 @@ jobs:
             ys-tf-azure-alert_rules,
             ys-tf-azure-action_groups
       
-      - name: Configure Git to use token
-        run: |
-          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
-      
       - uses: hashicorp/setup-terraform@v3
 
       # 1. Functional Requirement: Fmt/Validate
@@ -92,7 +88,12 @@ jobs:
       - name: Terraform Init & Plan
         env:
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GIT_TERMINAL_PROMPT: 0
         run: |
+          # Create .gitconfig with URL rewriting
+          echo "[url \"https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/\"]" > ~/.gitconfig
+          echo "  insteadOf = ssh://git@github.com/" >> ~/.gitconfig
+          
           terraform -chdir=${{ inputs.path }} init 
           # 3. Functional Requirement: Save Plan Artifact
           terraform -chdir=${{ inputs.path }} plan -out=tfplan
@@ -143,10 +144,6 @@ jobs:
             ys-tf-azure-app_insights,
             ys-tf-azure-alert_rules,
             ys-tf-azure-action_groups
-      
-      - name: Configure Git to use token
-        run: |
-          git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
       
       - uses: hashicorp/setup-terraform@v3
       
