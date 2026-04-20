@@ -159,13 +159,16 @@ jobs:
         env:
           GIT_TERMINAL_PROMPT: 0
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          # Configure Git URL rewriting via environment variables
-          GIT_CONFIG_COUNT: 1
-          GIT_CONFIG_KEY_0: "url.https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/.insteadOf"
-          GIT_CONFIG_VALUE_0: "ssh://git@github.com/"
         run: |
-          # Verify git config is set
-          git config --get-regexp url
+          # Create .gitconfig with URL rewriting
+          echo "[url \"https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/\"]" > ~/.gitconfig
+          echo "  insteadOf = ssh://git@github.com/" >> ~/.gitconfig
+          
+          # Verify git config
+          echo "=== .gitconfig contents ==="
+          cat ~/.gitconfig
+          echo "=== git config check ==="
+          git config --get-regexp url || true
           
           # Remove cached modules to force re-download with correct git config
           rm -rf ${{ inputs.path }}/.terraform/modules
