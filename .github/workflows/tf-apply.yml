@@ -68,6 +68,8 @@ jobs:
       
       - name: Configure Git to use token
         run: |
+          # Clear git config for self-hosted runners to avoid stale tokens
+          rm -f ~/.gitconfig || true
           git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
       
       - uses: hashicorp/setup-terraform@v3
@@ -146,6 +148,8 @@ jobs:
       
       - name: Configure Git to use token
         run: |
+          # Clear git config for self-hosted runners to avoid stale tokens
+          rm -f ~/.gitconfig || true
           git config --global url."https://x-access-token:${{ steps.generate-token.outputs.token }}@github.com/".insteadOf "ssh://git@github.com/"
       
       - uses: hashicorp/setup-terraform@v3
