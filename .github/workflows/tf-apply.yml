@@ -168,5 +168,6 @@ jobs:
 
       # 4. Functional Requirement: Automated Testing
       - name: Run Terratest
+        if: hashFiles('test/**') != ''
         run: |
           cd test && go test -v -timeout 15m
